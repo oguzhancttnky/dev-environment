@@ -1,5 +1,3 @@
-# Makefile for Fish shell setup
-
 all: sync
 
 sync:
@@ -14,7 +12,6 @@ sync:
 	fish -c "fisher update"
 
 clean:
-	@echo "Cleaning up..."
 	rm -f ~/.config/fish/config.fish
 	rm -rf ~/.config/fish/functions/
 	rm -f ~/.gitconfig
