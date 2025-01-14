@@ -11,9 +11,9 @@ ask_version() {
 echo "---Installing Fish and setting it as the default shell---"
 sudo apt-get update
 sudo apt-get install -y fish
-chsh -s /usr/bin/fish
+sudo chsh -s /usr/bin/fish
 
-echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, build-essential, python3, python3-pip, docker, openjdk, nodejs, pnpm, go)---"
+echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, build-essential, python3, python3-pip, docker, openjdk, nodejs, go)---"
 
 sudo apt-get install -y net-tools ca-certificates curl wget snapd build-essential
 
@@ -22,8 +22,9 @@ sudo apt-get install -y python3 python3-pip
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-bash -c 'echo \ "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable"' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+bash -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable"' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
 
 JAVA_VERSION=$(ask_version "Java" "21")
 echo "---Installing Java $JAVA_VERSION---"
@@ -33,10 +34,6 @@ NODE_VERSION=$(ask_version "Node.js" "20")
 echo "---Installing Node.js $NODE_VERSION---"
 curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
 sudo apt-get install -y nodejs
-
-PNPM_VERSION=$(ask_version "Pnpm" "10.0.0")
-echo "---Installing Pnpm $PNPM_VERSION---"
-curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_VERSION sh -
 
 GO_VERSION=$(ask_version "Go" "1.21.0")
 echo "---Installing Go $GO_VERSION---"
