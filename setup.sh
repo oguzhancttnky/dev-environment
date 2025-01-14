@@ -25,12 +25,14 @@ JAVA_VERSION=$(ask_version "Java" "21")
 echo "---Installing Java $JAVA_VERSION---"
 sudo apt-get install -y openjdk-${JAVA_VERSION}-jdk
 
-NODE_VERSION=$(ask_version "Node.js" "20_x")
+NODE_VERSION=$(ask_version "Node.js" "20")
 echo "---Installing Node.js $NODE_VERSION---"
 curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
 sudo apt-get install -y nodejs
 
-curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.0.0 sh -
+PNPM_VERSION=$(ask_version "Pnpm" "10.0.0")
+echo "---Installing Pnpm $PNPM_VERSION---"
+curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_VERSION sh -
 
 GO_VERSION=$(ask_version "Go" "1.21.0")
 echo "---Installing Go $GO_VERSION---"
