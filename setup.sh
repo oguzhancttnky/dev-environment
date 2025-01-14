@@ -15,7 +15,7 @@ chsh -s /usr/bin/fish
 
 echo "---Installing necessary tools---"
 
-sudo apt-get install -y curl wget
+sudo apt-get install -y net-tools curl wget snapd
 
 sudo apt-get install -y gcc
 

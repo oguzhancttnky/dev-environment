@@ -7,3 +7,6 @@ if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
+
+bind \cR history-search-backward
+bind \cS history-search-forward
