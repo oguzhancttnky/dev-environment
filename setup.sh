@@ -35,6 +35,8 @@ echo "---Installing Node.js $NODE_VERSION---"
 curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
 sudo apt-get install -y nodejs
 
+sudo npm install -g pnpm
+
 GO_VERSION=$(ask_version "Go" "1.21.0")
 echo "---Installing Go $GO_VERSION---"
 wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
