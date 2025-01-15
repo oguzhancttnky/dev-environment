@@ -1,6 +1,6 @@
-# Dotfiles
+# Development Environment
 
-This repository contains my personal dotfiles. It will be updated as I continue to customize my development environment.
+This repository contains my personal development environment. I am using it to keep track of my configuration files and to easily set up a new system.
 
 ## Setup
 
