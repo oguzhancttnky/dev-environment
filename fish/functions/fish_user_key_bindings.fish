@@ -19,7 +19,6 @@ function _fzf_search_history --description "Search command history."
             --query=(commandline) \
             --preview="string replace --regex '$time_prefix_regex' '' -- {} | fish_indent --ansi" \
             --preview-window="bottom:3:wrap" \
-            --bind="ctrl-r:execute(echo {q})+abort" \
             $fzf_history_opts |
         string split0 |
         string replace --regex $time_prefix_regex ''
