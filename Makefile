@@ -6,8 +6,8 @@ sync:
 	[ -f ~/.gitconfig ] || ln -s $(PWD)/.gitconfig ~/.gitconfig
 
 clean:
-	[ -e ~/.config/fish/config.fish ] && rm -rf ~/.config/fish/config.fish
-	[ -e ~/.config/fish/functions ] && rm -rf ~/.config/fish/functions
-	[ -e ~/.gitconfig ] && rm -rf ~/.gitconfig
+	rm -rf ~/.config/fish/config.fish || true
+	rm -rf ~/.config/fish/functions || true
+	rm -rf ~/.gitconfig || true
 
 .PHONY: all clean sync
