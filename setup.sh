@@ -13,9 +13,9 @@ sudo apt-get update
 sudo apt-get install -y fish
 sudo chsh -s /usr/bin/fish
 
-echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, python3, python3-pip, docker, openjdk, nodejs, go)---"
+echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python3, python3-pip, docker, openjdk, nodejs, go)---"
 
-sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential
+sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential, libfuse2
 
 sudo apt-get install -y python3 python3-pip
 
