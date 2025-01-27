@@ -13,9 +13,9 @@ sudo apt-get update
 sudo apt-get install -y fish
 sudo chsh -s /usr/bin/fish
 
-echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python3, python3-pip, docker, openjdk, nodejs, go, rust, cargo)---"
+echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python3, python3-pip, docker, openjdk, nodejs, go, rust, cargo, rustup)---"
 
-sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential, libfuse2, rustc cargo
+sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential, libfuse2
 
 sudo apt-get install -y python3 python3-pip
 
@@ -42,6 +42,8 @@ echo "---Installing Go $GO_VERSION---"
 wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm go${GO_VERSION}.linux-amd64.tar.gz
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "---Installing Fish plugins---"
 fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
