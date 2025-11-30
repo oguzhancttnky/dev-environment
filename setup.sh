@@ -13,11 +13,9 @@ sudo apt-get update
 sudo apt-get install -y fish
 sudo chsh -s /usr/bin/fish
 
-echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python3, python3-pip, docker, openjdk, gradle, nodejs, go, rust, cargo, rustup)---"
+echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python, docker, openjdk, nodejs, go, rust, cargo, rustup)---"
 
-sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential, libfuse2
-
-sudo apt-get install -y python3 python3-pip
+sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential libfuse2
 
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -29,7 +27,7 @@ sudo usermod -aG docker $USER
 JAVA_VERSION=$(ask_version "Java" "25")
 NODE_VERSION=$(ask_version "Node.js" "22")
 GO_VERSION=$(ask_version "Go" "1.25.4")
-PYTHON_VERSION=$(ask_version "Python" "3.14")
+PYTHON_VERSION=$(ask_version "Python" "3.13")
 
 echo "---Installing Java $JAVA_VERSION---"
 sudo apt-get install -y openjdk-${JAVA_VERSION}-jdk
@@ -47,7 +45,7 @@ sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm go${GO_VERSION}.linux-amd64.tar.gz
 
 echo "---Installing Python $PYTHON_VERSION---"
-sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo add-apt-repository -y ppa:deadsnakes/ppa >/dev/null 2>&1
 sudo apt-get update
 sudo apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python${PYTHON_VERSION}-dev python3-pip
 
@@ -60,6 +58,8 @@ fish -c "fisher update"
 
 # Snap Installs
 echo "---Installing Tools from Snap---"
-sudo snap install code --classic pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client sublime-text sublime-merge --classic superproductivity beekeeper-studio
+sudo snap install code --classic
+sudo snap install sublime-merge --classic
+sudo snap install pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client sublime-text superproductivity beekeeper-studio
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"
