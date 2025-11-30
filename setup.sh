@@ -8,8 +8,14 @@ ask_version() {
     echo "${version:-$default_version}"
 }
 
+JAVA_VERSION=$(ask_version "Java" "25")
+NODE_VERSION=$(ask_version "Node.js" "22")
+GO_VERSION=$(ask_version "Go" "1.25.4")
+PYTHON_VERSION=$(ask_version "Python" "3.13")
+
 echo "---Installing Fish and setting it as the default shell---"
-sudo apt-get update
+sudo apt-add-repository -y ppa:fish-shell/release-4 >/dev/null 2>&1
+sudo apt-get update -y
 sudo apt-get install -y fish
 sudo chsh -s /usr/bin/fish
 
@@ -20,16 +26,11 @@ sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-esse
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-bash -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable"' | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+bash -c "echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \$(. /etc/os-release && echo \"\$VERSION_CODENAME\") stable\"" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
 echo "---Installing Java, Node.js, Go, Python, Rust, Kotlin---"
-JAVA_VERSION=$(ask_version "Java" "25")
-NODE_VERSION=$(ask_version "Node.js" "22")
-GO_VERSION=$(ask_version "Go" "1.25.4")
-PYTHON_VERSION=$(ask_version "Python" "3.13")
-
 echo "---Installing Java $JAVA_VERSION---"
 sudo apt-get install -y openjdk-${JAVA_VERSION}-jdk
 
@@ -47,15 +48,19 @@ rm go${GO_VERSION}.linux-amd64.tar.gz
 
 echo "---Installing Python $PYTHON_VERSION---"
 sudo add-apt-repository -y ppa:deadsnakes/ppa >/dev/null 2>&1
-sudo apt-get update
+sudo apt-get update -y
 sudo apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python${PYTHON_VERSION}-dev python3-pip
 
 echo "---Installing Rust and Cargo---"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "---Installing Fish plugins---"
-fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher jorgebucaran/autopair.fish"
+fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install (cat fisher_plugins)"
 fish -c "fisher update"
+fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
+# Disable Node.js version display
+fish -c "set -U tide_right_prompt_items (string match -v node \$tide_right_prompt_items)"
+fish -c "set -U tide_left_prompt_items (string match -v node \$tide_left_prompt_items)"
 
 # Snap Installs
 echo "---Installing Tools from Snap---"
