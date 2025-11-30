@@ -26,34 +26,40 @@ bash -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyring
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
-JAVA_VERSION=$(ask_version "Java" "21")
+JAVA_VERSION=$(ask_version "Java" "25")
+NODE_VERSION=$(ask_version "Node.js" "22")
+GO_VERSION=$(ask_version "Go" "1.25.4")
+PYTHON_VERSION=$(ask_version "Python" "3.14")
+
 echo "---Installing Java $JAVA_VERSION---"
 sudo apt-get install -y openjdk-${JAVA_VERSION}-jdk
 
-echo "---Installing Gradle 8.12.1---"
-wget https://services.gradle.org/distributions/gradle-8.12.1-bin.zip
-sudo mkdir /opt/gradle
-sudo unzip -d /opt/gradle gradle-8.12.1-bin.zip
-rm gradle-8.12.1-bin.zip
-
-NODE_VERSION=$(ask_version "Node.js" "20")
 echo "---Installing Node.js $NODE_VERSION---"
 curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
 sudo apt-get install -y nodejs
 
+echo "---Installing Global PNPM---"
 sudo npm install -g pnpm
 
-GO_VERSION=$(ask_version "Go" "1.21.0")
 echo "---Installing Go $GO_VERSION---"
 wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm go${GO_VERSION}.linux-amd64.tar.gz
 
+echo "---Installing Python $PYTHON_VERSION---"
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python${PYTHON_VERSION}-dev python3-pip
+
 echo "---Installing Rust and Cargo---"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "---Installing Fish plugins---"
-fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher jorgebucaran/autopair.fish"
 fish -c "fisher update"
+
+# Snap Installs
+echo "---Installing Tools from Snap---"
+sudo snap install code --classic pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client sublime-text sublime-merge --classic superproductivity beekeeper-studio
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"
