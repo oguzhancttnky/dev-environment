@@ -55,8 +55,12 @@ echo "---Installing Rust and Cargo---"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "---Installing Fish plugins---"
-fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install (cat ./fish/fish_plugins)"
-fish -c "fisher update"
+rm -rf ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
+mkdir -p ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
+chown -R $USER:$USER ~/.config/fish
+
+fish -c "curl -sL https://git.io/fisher | source; fisher install jorgebucaran/fisher"
+fish -c "fisher install (cat ./fish/fish_plugins)"
 fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
 # Disable Node.js version display
 fish -c "set -U tide_right_prompt_items (string match -v node \$tide_right_prompt_items)"
