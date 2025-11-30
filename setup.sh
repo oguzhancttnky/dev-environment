@@ -55,7 +55,7 @@ echo "---Installing Rust and Cargo---"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 echo "---Installing Fish plugins---"
-fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install (cat fisher_plugins)"
+fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install (cat ./fish/fish_plugins)"
 fish -c "fisher update"
 fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
 # Disable Node.js version display
@@ -65,8 +65,9 @@ fish -c "set -U tide_left_prompt_items (string match -v node \$tide_left_prompt_
 # Snap Installs
 echo "---Installing Tools from Snap---"
 sudo snap install --classic code
+sudo snap install --classic sublime-text
 sudo snap install --classic sublime-merge
 sudo snap install --classic kotlin
-sudo snap install pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client sublime-text superproductivity beekeeper-studio
+sudo snap install pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client superproductivity beekeeper-studio
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"
