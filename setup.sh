@@ -13,7 +13,7 @@ sudo apt-get update
 sudo apt-get install -y fish
 sudo chsh -s /usr/bin/fish
 
-echo "---Installing necessary tools (net-tools, ca-certificates, curl, wget, snapd, fzf, build-essential, libfuse2, python, docker, openjdk, nodejs, go, rust, cargo, rustup)---"
+echo "---Installing necessary tools---"
 
 sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential libfuse2
 
@@ -24,6 +24,7 @@ bash -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyring
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
+echo "---Installing Java, Node.js, Go, Python, Rust, Kotlin---"
 JAVA_VERSION=$(ask_version "Java" "25")
 NODE_VERSION=$(ask_version "Node.js" "22")
 GO_VERSION=$(ask_version "Go" "1.25.4")
@@ -58,8 +59,9 @@ fish -c "fisher update"
 
 # Snap Installs
 echo "---Installing Tools from Snap---"
-sudo snap install code --classic
-sudo snap install sublime-merge --classic
+sudo snap install --classic code
+sudo snap install --classic sublime-merge
+sudo snap install --classic kotlin
 sudo snap install pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client sublime-text superproductivity beekeeper-studio
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"
