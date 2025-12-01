@@ -59,12 +59,9 @@ rm -rf ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
 mkdir -p ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
 chown -R $USER:$USER ~/.config/fish
 
-fish -c "curl -sL https://git.io/fisher | source; fisher install jorgebucaran/fisher"
+fish -c "curl -sL https://git.io/fisher | source"
 fish -c "fisher install (cat ./fish/fish_plugins)"
 fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
-# Disable Node.js version display
-fish -c "set -U tide_right_prompt_items (string match -v node \$tide_right_prompt_items)"
-fish -c "set -U tide_left_prompt_items (string match -v node \$tide_left_prompt_items)"
 
 # Snap Installs
 echo "---Installing Tools from Snap---"
