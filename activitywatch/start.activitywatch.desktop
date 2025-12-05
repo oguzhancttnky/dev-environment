@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/bin/sh -c "$HOME/.local/opt/activitywatch/start.sh"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=Activity Watch Starter
+Name=Activity Watch Starter
+Comment[en_US]=
+Comment=
