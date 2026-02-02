@@ -62,7 +62,10 @@ chown -R $USER:$USER ~/.config/fish
 
 fish -c 'curl -sL https://git.io/fisher | source; fisher install jorgebucaran/fisher'
 fish -c "fisher install (cat ./fish/fish_plugins)"
-fish -c "tide configure --auto --style=Lean --prompt_colors='True color' --show_time='24-hour format' --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
+fish -c "tide configure --auto --style=Lean --prompt_colors='16 colors' --show_time=No --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
+# Disable version display
+set -U tide_right_prompt_items (string match -v -r 'node|python|java|rustc|go' $tide_right_prompt_items)
+set -U tide_left_prompt_items (string match -v -r 'node|python|java|rustc|go' $tide_left_prompt_items)
 cp fish/fish-ai.ini ~/.config/
 
 echo "---Installing Ollama---"
