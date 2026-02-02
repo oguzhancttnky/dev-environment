@@ -11,7 +11,6 @@ ask_version() {
 JAVA_VERSION=$(ask_version "Java" "25")
 NODE_VERSION=$(ask_version "Node.js" "22")
 GO_VERSION=$(ask_version "Go" "1.25.4")
-PYTHON_VERSION=$(ask_version "Python" "3.13")
 ACTIVITY_WATCH_VERSION="v0.13.2"
 
 echo "---Installing Fish and setting it as the default shell---"
@@ -47,10 +46,11 @@ wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm go${GO_VERSION}.linux-amd64.tar.gz
 
-echo "---Installing Python $PYTHON_VERSION---"
-sudo add-apt-repository -y ppa:deadsnakes/ppa >/dev/null 2>&1
-sudo apt-get update -y
-sudo apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python${PYTHON_VERSION}-dev python3-pip
+echo "---Installing Miniconda---"
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
 
 echo "---Installing Rust and Cargo---"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
