@@ -22,7 +22,10 @@ sudo chsh -s /usr/bin/fish "$USER"
 
 echo "---Installing necessary tools---"
 
-sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential libfuse2 git-lfs
+sudo apt-get install -y net-tools ca-certificates curl wget snapd fzf build-essential libfuse2 git-lfs gpaste-2 gnome-shell-extension-gpaste ripgrep fd-find bat jq btop pipx gh
+mkdir -p ~/.local/bin
+ln -sf /usr/bin/fdfind ~/.local/bin/fd
+ln -sf /usr/bin/batcat ~/.local/bin/bat
 
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
