@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 ask_version() {
     local tool_name=$1
     local default_version=$2
@@ -16,7 +18,7 @@ echo "---Installing Fish and setting it as the default shell---"
 sudo apt-add-repository -y ppa:fish-shell/release-4 >/dev/null 2>&1
 sudo apt-get update -y
 sudo apt-get install -y fish
-sudo chsh -s /usr/bin/fish
+sudo chsh -s /usr/bin/fish "$USER"
 
 echo "---Installing necessary tools---"
 
@@ -26,6 +28,7 @@ sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 bash -c "echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \$(. /etc/os-release && echo \"\$VERSION_CODENAME\") stable\"" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update -y
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
@@ -35,6 +38,7 @@ sudo apt-get install -y openjdk-${JAVA_VERSION}-jdk
 
 echo "---Installing Node.js $NODE_VERSION---"
 curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo bash -
+sudo apt-get update -y
 sudo apt-get install -y nodejs
 
 echo "---Installing Global PNPM---"
@@ -42,6 +46,7 @@ sudo npm install -g pnpm
 
 echo "---Installing Go $GO_VERSION---"
 wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm go${GO_VERSION}.linux-amd64.tar.gz
 
@@ -63,8 +68,8 @@ fish -c 'curl -sL https://git.io/fisher | source; fisher install jorgebucaran/fi
 fish -c "fisher install (cat ./fish/fish_plugins)"
 fish -c "tide configure --auto --style=Lean --prompt_colors='16 colors' --show_time=No --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
 # Disable version display
-set -U tide_right_prompt_items (string match -v -r 'node|python|java|rustc|go' $tide_right_prompt_items)
-set -U tide_left_prompt_items (string match -v -r 'node|python|java|rustc|go' $tide_left_prompt_items)
+fish -c "set -U tide_right_prompt_items (string match -v -r 'node|python|java|rustc|go' \$tide_right_prompt_items)"
+fish -c "set -U tide_left_prompt_items (string match -v -r 'node|python|java|rustc|go' \$tide_left_prompt_items)"
 cp fish/fish-ai.ini ~/.config/
 
 echo "---Installing Ollama---"
