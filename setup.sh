@@ -54,8 +54,8 @@ snap_install_latest() {
 }
 
 JAVA_VERSION=$(ask_version "Java" "25")
-NODE_VERSION=$(ask_version "Node.js" "22")
-GO_VERSION=$(ask_version "Go" "1.25.4")
+NODE_VERSION=$(ask_version "Node.js" "26")
+GO_VERSION=$(ask_version "Go" "1.26.3")
 
 echo "---Installing Fish and setting it as the default shell---"
 sudo apt-add-repository -y ppa:fish-shell/release-4 >/dev/null 2>&1
