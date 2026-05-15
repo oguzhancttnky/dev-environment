@@ -11,7 +11,6 @@ ask_version() {
 JAVA_VERSION=$(ask_version "Java" "25")
 NODE_VERSION=$(ask_version "Node.js" "22")
 GO_VERSION=$(ask_version "Go" "1.25.4")
-ACTIVITY_WATCH_VERSION="v0.13.2"
 
 echo "---Installing Fish and setting it as the default shell---"
 sudo apt-add-repository -y ppa:fish-shell/release-4 >/dev/null 2>&1
@@ -78,25 +77,5 @@ sudo snap install --classic sublime-text
 sudo snap install --classic sublime-merge
 sudo snap install --classic kotlin
 sudo snap install pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client superproductivity beekeeper-studio
-
-# Install ActivityWatch
-echo "---Installing ActivityWatch---"
-rm -rf ~/.local/opt/activitywatch/
-rm -rf ~/.config/autostart/start.activitywatch.desktop
-
-wget "https://github.com/ActivityWatch/activitywatch/releases/download/$ACTIVITY_WATCH_VERSION/activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64.zip"
-unzip -q activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64.zip -d activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64
-
-mv activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64/activitywatch/ ~/.local/opt/
-
-cp activitywatch/start.sh ~/.local/opt/activitywatch/
-cp activitywatch/kill.sh ~/.local/opt/activitywatch/
-chmod +x ~/.local/opt/activitywatch/start.sh
-chmod +x ~/.local/opt/activitywatch/kill.sh
-mkdir -p ~/.config/autostart/
-cp activitywatch/start.activitywatch.desktop ~/.config/autostart/
-
-rm -rf activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64.zip
-rm -rf activitywatch-$ACTIVITY_WATCH_VERSION-linux-x86_64
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"
