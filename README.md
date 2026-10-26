@@ -27,7 +27,7 @@ Bash is the default shell. `make` adds one line to `~/.bashrc` that sources [bas
 - Catppuccin Mocha look: Colloid GTK/Shell theme, Papirus icons with Catppuccin folders, Bibata cursor, Inter + JetBrainsMono Nerd Font
 - GNOME Shell extensions: User Themes, Blur my Shell, Just Perfection, Vitals, Space Bar, Rounded Window Corners, Burn My Windows
 - Auto-hiding Ubuntu Dock, Catppuccin GNOME Terminal profile, fastfetch in new terminals
-- Rotating wallpapers from Wallhaven with a separate image per monitor (portrait monitors get portrait images)
+- Rotating wallpapers from Wallhaven, the same image on every monitor (set `WALLPAPER_PER_MONITOR=true` for a separate, orientation matched image per monitor)
 
 Run it alone, or only some sections:
 
@@ -48,4 +48,4 @@ Wallpaper commands:
 | `wallpaper fetch [N]` | | Download N new images per orientation |
 | `wallpaper status` | | Current images and pool size |
 
-Your own images can be dropped into `~/Pictures/Wallpapers/landscape` or `~/Pictures/Wallpapers/portrait`.
+Wallpapers are kept in `~/Pictures/Wallpapers/landscape` (and `portrait` in per-monitor mode). Downloaded ones are reused; only the oldest are deleted once there are more than `WALLPAPER_CACHE_MAX`, and banned ones are deleted right away. Your own images can be dropped in there too and are never deleted.

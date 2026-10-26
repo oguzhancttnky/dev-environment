@@ -259,14 +259,21 @@ def set_background(path, option):
     Gio.Settings.sync()
 
 
+def get_targets(cfg, monitors):
+    """Monitors that get their own image: all of them, or only the largest one when one
+    image is shared by every monitor."""
+    if as_bool(cfg.get("WALLPAPER_PER_MONITOR", "true")) and len(monitors) > 1:
+        return monitors, True
+    return [max(monitors, key=lambda m: m["w"] * m["h"])], False
+
+
 def apply(cfg, state, keep=None):
     """Pick and set new images. Monitors listed in `keep` reuse their current image."""
     keep = keep or {}
     monitors = get_monitors()
-    per_monitor = as_bool(cfg.get("WALLPAPER_PER_MONITOR", "true")) and len(monitors) > 1
+    targets, per_monitor = get_targets(cfg, monitors)
     banned = load_banned()
     online = as_bool(cfg.get("WALLPAPER_ONLINE", "true"))
-    targets = monitors if per_monitor else [max(monitors, key=lambda m: m["w"] * m["h"])]
     history = state.get("history", [])
 
     chosen = []
@@ -288,16 +295,18 @@ def apply(cfg, state, keep=None):
         chosen.append(str(img))
 
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    out = None
     if per_monitor:
         # A new filename each time so GNOME notices the change.
         out = CACHE_DIR / f"span-{int(time.time())}.jpg"
         compose_span(targets, chosen, out)
         set_background(out, "spanned")
-        for old in CACHE_DIR.glob("span-*.jpg"):
-            if old != out:
-                old.unlink(missing_ok=True)
     else:
+        # GNOME zooms the same image to fill every monitor.
         set_background(chosen[0], "zoom")
+    for old in CACHE_DIR.glob("span-*.jpg"):
+        if old != out:
+            old.unlink(missing_ok=True)
 
     state["current"] = {mon["name"]: img for mon, img in zip(targets, chosen)}
     keep = int(cfg.get("WALLPAPER_HISTORY", 30))
@@ -312,8 +321,9 @@ def prefetch(cfg):
     if not as_bool(cfg.get("WALLPAPER_ONLINE", "true")):
         return
     monitors = get_monitors()
+    targets, _ = get_targets(cfg, monitors)
     history = set(load_state().get("history", []))
-    for orientation in {orientation_of(m) for m in monitors}:
+    for orientation in {orientation_of(m) for m in targets}:
         fetch_one(cfg, orientation, min_resolution(monitors, orientation), load_banned())
         prune_pool(cfg, orientation, keep=history)
 
@@ -342,8 +352,9 @@ def cmd_ban(cfg, which="all"):
 
 def cmd_fetch(cfg, count="5"):
     monitors = get_monitors()
+    targets, _ = get_targets(cfg, monitors)
     banned = load_banned()
-    for orientation in {orientation_of(m) for m in monitors}:
+    for orientation in {orientation_of(m) for m in targets}:
         for _ in range(int(count)):
             fetch_one(cfg, orientation, min_resolution(monitors, orientation), banned)
     return True
