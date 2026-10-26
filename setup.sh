@@ -57,23 +57,26 @@ JAVA_VERSION=$(ask_version "Java" "25")
 NODE_VERSION=$(ask_version "Node.js" "26")
 GO_VERSION=$(ask_version "Go" "1.26.3")
 
-echo "---Installing Fish and setting it as the default shell---"
-sudo apt-add-repository -y ppa:fish-shell/release-4 >/dev/null 2>&1
-sudo apt-get update -y
-apt_install_latest fish
+echo "---Setting Bash as the default shell---"
 current_shell=$(getent passwd "$USER" | cut -d: -f7)
-if [ "$current_shell" != "/usr/bin/fish" ]; then
-    sudo chsh -s /usr/bin/fish "$USER"
+if [ "$current_shell" != "/bin/bash" ] && [ "$current_shell" != "/usr/bin/bash" ]; then
+    sudo chsh -s /bin/bash "$USER"
 else
-    echo "---Fish is already the default shell---"
+    echo "---Bash is already the default shell---"
 fi
 
 echo "---Installing necessary tools---"
 
-apt_install_latest net-tools ca-certificates curl wget snapd fzf build-essential libfuse2 git-lfs gpaste-2 gnome-shell-extension-gpaste ripgrep fd-find bat jq btop pipx gh
+apt_install_latest net-tools ca-certificates curl wget snapd fzf build-essential libfuse2 git-lfs gpaste-2 gnome-shell-extension-gpaste ripgrep fd-find bat eza jq btop pipx gh
 mkdir -p ~/.local/bin
 ln -sf /usr/bin/fdfind ~/.local/bin/fd
 ln -sf /usr/bin/batcat ~/.local/bin/bat
+
+echo "---Installing Catppuccin theme for bat---"
+bat_themes="$(batcat --config-dir)/themes"
+mkdir -p "$bat_themes"
+curl -fsSL "https://raw.githubusercontent.com/catppuccin/bat/main/themes/Catppuccin%20Mocha.tmTheme" -o "$bat_themes/Catppuccin Mocha.tmTheme"
+batcat cache --build >/dev/null
 
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -127,18 +130,19 @@ else
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi
 
-echo "---Installing Fish plugins---"
-rm -rf ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
-mkdir -p ~/.config/fish/functions ~/.config/fish/completions ~/.config/fish/conf.d
-chown -R $USER:$USER ~/.config/fish
+echo "---Installing Starship prompt---"
+latest_starship_version=$(curl -fsSL https://api.github.com/repos/starship/starship/releases/latest | jq -r '.tag_name | ltrimstr("v")')
+if command_exists starship && starship --version | grep -q "$latest_starship_version"; then
+    echo "---Starship is already up to date ($latest_starship_version)---"
+else
+    curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b ~/.local/bin
+fi
 
-fish -c 'curl -sL https://git.io/fisher | source; fisher install jorgebucaran/fisher'
-fish -c "fisher install (cat ./fish/fish_plugins)"
-fish -c "tide configure --auto --style=Lean --prompt_colors='16 colors' --show_time=No --lean_prompt_height='One line' --prompt_spacing=Compact --icons='Few icons' --transient=No"
-# Disable version display
-fish -c "set -U tide_right_prompt_items (string match -v -r 'node|python|java|rustc|go' \$tide_right_prompt_items)"
-fish -c "set -U tide_left_prompt_items (string match -v -r 'node|python|java|rustc|go' \$tide_left_prompt_items)"
-cp fish/fish-ai.ini ~/.config/
+echo "---Installing ble.sh (fish-like autosuggestions and highlighting for Bash)---"
+blesh_tmp=$(mktemp -d)
+curl -fsSL https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz | tar -xJf - -C "$blesh_tmp"
+bash "$blesh_tmp/ble-nightly/ble.sh" --install ~/.local/share
+rm -rf "$blesh_tmp"
 
 echo "---Installing Ollama---"
 latest_ollama_version=$(curl -fsSL https://api.github.com/repos/ollama/ollama/releases/latest | jq -r '.tag_name | ltrimstr("v")')
@@ -152,5 +156,8 @@ fi
 echo "---Installing Tools from Snap---"
 snap_install_latest --classic code sublime-text sublime-merge kotlin
 snap_install_latest pgadmin4 postman bruno localsend another-redis-desktop-manager vlc zoom-client superproductivity beekeeper-studio
+
+echo "---Customizing GNOME desktop (configure in desktop/desktop.conf)---"
+./desktop/setup-desktop.sh
 
 echo "---System setup completed. Run 'make' to setup symlinks of dotfiles---"

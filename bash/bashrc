@@ -1,0 +1,73 @@
+# Sourced from the end of ~/.bashrc (the line is added by `make`).
+# Machine specific things (conda, sdkman, brew ...) stay in ~/.bashrc.
+
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
+
+# ble.sh: fish-like autosuggestions, syntax highlighting and auto-pairing.
+# Loaded early with --noattach and attached at the very end of this file.
+if [ -f "$HOME/.local/share/blesh/ble.sh" ]; then
+    source "$HOME/.local/share/blesh/ble.sh" --noattach
+fi
+
+export EDITOR=code
+export VISUAL=code
+
+path_prepend() {
+    for dir in "$@"; do
+        [ -d "$dir" ] || continue
+        case ":$PATH:" in
+            *":$dir:"*) ;;
+            *) PATH="$dir:$PATH" ;;
+        esac
+    done
+}
+path_prepend \
+    "$HOME/.opencode/bin" \
+    "$HOME/miniconda3/bin" \
+    /usr/local/go/bin \
+    "$HOME/go/bin" \
+    "$HOME/.cargo/bin" \
+    "$HOME/.local/bin"
+export PATH
+
+# History: large, shared between terminals, without duplicates
+HISTSIZE=100000
+HISTFILESIZE=200000
+HISTCONTROL=ignoreboth:erasedups
+shopt -s histappend cmdhist
+PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+
+shopt -s autocd cdspell dirspell globstar checkwinsize
+
+# fzf: Ctrl+R history, Ctrl+T files, Alt+C directories
+if command -v fzf >/dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border \
+--color=bg+:#313244,spinner:#f5e0dc,hl:#f38ba8,fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+--color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8,selected-bg:#45475a"
+    if [[ ${BLE_VERSION-} ]]; then
+        _ble_contrib_fzf_base=/usr/share/doc/fzf/examples
+        ble-import -d integration/fzf-key-bindings
+    elif [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+        source /usr/share/doc/fzf/examples/key-bindings.bash
+    fi
+    [ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf
+fi
+
+source "$(dirname "${BASH_SOURCE[0]}")/aliases.bash"
+
+# Extra snippets written by other setup scripts (e.g. desktop/setup-desktop.sh)
+for snippet in "$HOME"/.config/bash/conf.d/*.bash; do
+    [ -r "$snippet" ] && source "$snippet"
+done
+unset snippet
+
+if command -v starship >/dev/null; then
+    eval "$(starship init bash)"
+fi
+
+[[ ${BLE_VERSION-} ]] && ble-attach

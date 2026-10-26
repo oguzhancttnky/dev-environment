@@ -1,0 +1,27 @@
+# ble.sh settings (https://github.com/akinomyoga/ble.sh)
+
+bleopt edit_abell=
+bleopt edit_vbell=
+bleopt complete_auto_delay=100
+bleopt exec_errexit_mark=
+bleopt history_share=1
+
+# Catppuccin Mocha colors
+ble-face -s auto_complete           fg='#6c7086'
+ble-face -s region                  bg='#45475a'
+ble-face -s region_insert           bg='#313244'
+ble-face -s syntax_command          fg='#a6e3a1'
+ble-face -s command_builtin         fg='#a6e3a1'
+ble-face -s command_alias           fg='#94e2d5'
+ble-face -s command_function        fg='#89b4fa'
+ble-face -s command_file            fg='#a6e3a1'
+ble-face -s command_keyword         fg='#cba6f7'
+ble-face -s syntax_error            fg='#f38ba8'
+ble-face -s syntax_quoted           fg='#f9e2af'
+ble-face -s syntax_quotation        fg='#f9e2af'
+ble-face -s syntax_comment          fg='#6c7086'
+ble-face -s syntax_param_expansion  fg='#f5c2e7'
+ble-face -s syntax_varname          fg='#f5c2e7'
+ble-face -s varname_expr            fg='#f5c2e7'
+ble-face -s filename_directory      fg='#89b4fa',underline
+ble-face -s filename_executable     fg='#a6e3a1',underline
