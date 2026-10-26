@@ -397,7 +397,8 @@ EOF
     fi
     local gdm_settings="sudo -H -u gdm dbus-run-session gsettings set org.gnome.desktop.interface"
     (cd / && $gdm_settings cursor-theme "$CURSOR_THEME" && $gdm_settings cursor-size "$CURSOR_SIZE" \
-        && $gdm_settings font-name "$INTERFACE_FONT")
+        && $gdm_settings font-name "$INTERFACE_FONT" \
+        && sudo -H -u gdm dbus-run-session gsettings set org.gnome.login-screen logo "$GDM_LOGO")
     log "The new login screen shows up after the next logout or reboot"
 }
 
