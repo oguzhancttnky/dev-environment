@@ -15,7 +15,7 @@ EXT_DCONF_ROOT="/org/gnome/shell/extensions"
 # shellcheck source=desktop.conf
 source "$DESKTOP_DIR/desktop.conf"
 
-ALL_SECTIONS=(packages theme icons cursor fonts extensions dock terminal wallpaper keybindings)
+ALL_SECTIONS=(packages theme icons cursor fonts extensions dock terminal wallpaper keybindings plymouth grub gdm)
 
 log() {
     echo "---$*---"
@@ -83,6 +83,8 @@ section_packages() {
     log "Installing desktop packages"
     local packages=(git curl jq pipx imagemagick sassc gnome-themes-extra gtk2-engines-murrine fontconfig)
     is_true "$ENABLE_FONTS" && packages+=(fonts-inter)
+    is_true "$ENABLE_GDM" && packages+=(libglib2.0-dev-bin dbus)
+    is_true "$ENABLE_GRUB" && is_true "$GRUB_SHOW_OTHER_OS" && packages+=(os-prober)
     apt_ensure "${packages[@]}"
     if is_true "$ENABLE_TERMINAL" && is_true "$TERMINAL_FASTFETCH" && ! command -v fastfetch >/dev/null; then
         sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch >/dev/null
@@ -322,6 +324,83 @@ section_keybindings() {
     set_custom_keybinding wallpaper-ban "Ban current wallpaper" "$DESKTOP_DIR/wallpaper.py ban" "$KEY_WALLPAPER_BAN"
 }
 
+section_plymouth() {
+    log "Installing $PLYMOUTH_THEME boot splash"
+    local dir
+    dir=$(git_sync catppuccin/plymouth)
+    sudo rm -rf "/usr/share/plymouth/themes/$PLYMOUTH_THEME"
+    sudo cp -r "$dir/themes/$PLYMOUTH_THEME" /usr/share/plymouth/themes/
+    local theme_file="/usr/share/plymouth/themes/$PLYMOUTH_THEME/$PLYMOUTH_THEME.plymouth"
+    sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth "$theme_file" 200
+    sudo update-alternatives --set default.plymouth "$theme_file"
+    sudo update-initramfs -u
+}
+
+section_grub() {
+    local name="catppuccin-$GRUB_FLAVOR-grub-theme"
+    log "Configuring GRUB ($name, ${GRUB_MENU_TIMEOUT}s)"
+    local dir
+    dir=$(git_sync catppuccin/grub)
+    sudo mkdir -p /usr/share/grub/themes
+    sudo rm -rf "/usr/share/grub/themes/$name"
+    sudo cp -r "$dir/src/$name" /usr/share/grub/themes/
+    local disable_os_prober=true
+    is_true "$GRUB_SHOW_OTHER_OS" && disable_os_prober=false
+    # A drop-in loaded after /etc/default/grub, so the distro file stays untouched
+    sudo mkdir -p /etc/default/grub.d
+    sudo tee /etc/default/grub.d/99-dev-environment.cfg >/dev/null <<EOF
+# Managed by dev-environment/desktop/setup-desktop.sh
+GRUB_TIMEOUT_STYLE=menu
+GRUB_TIMEOUT=$GRUB_MENU_TIMEOUT
+GRUB_THEME="/usr/share/grub/themes/$name/theme.txt"
+GRUB_DISABLE_OS_PROBER=$disable_os_prober
+EOF
+    sudo update-grub
+}
+
+section_gdm() {
+    log "Theming the login screen (GDM)"
+    # Repack Ubuntu's Yaru shell theme with recolored login screen rules as a separate
+    # gdm-theme.gresource alternative; the original Yaru file is left untouched.
+    local source=/usr/share/gnome-shell/theme/Yaru/gnome-shell-theme.gresource
+    local target=/usr/share/gnome-shell/theme/dev-environment/gdm-theme.gresource
+    local prefix=/org/gnome/shell/theme
+    local work
+    work=$(mktemp -d)
+    for resource in $(gresource list "$source"); do
+        local file="$work/${resource#"$prefix"/}"
+        mkdir -p "$(dirname "$file")"
+        gresource extract "$source" "$resource" >"$file"
+    done
+    cat >>"$work/gdm.css" <<EOF
+
+/* dev-environment */
+#lockDialogGroup { background-color: $GDM_BACKGROUND_COLOR; background-image: none; }
+.login-dialog-button.default, .unlock-dialog .button.default { background-color: $GDM_ACCENT_COLOR; color: $GDM_BACKGROUND_COLOR; }
+EOF
+    {
+        echo '<?xml version="1.0" encoding="UTF-8"?>'
+        echo "<gresources><gresource prefix=\"$prefix\">"
+        (cd "$work" && find . -type f | sed 's|^\./||' | sort | sed 's|.*|<file>&</file>|')
+        echo '</gresource></gresources>'
+    } >"$work.xml"
+    glib-compile-resources --sourcedir="$work" --target="$work.gresource" "$work.xml"
+    sudo install -D -m 0644 "$work.gresource" "$target"
+    rm -rf "$work" "$work.xml" "$work.gresource"
+    sudo update-alternatives --install /usr/share/gnome-shell/gdm-theme.gresource gdm-theme.gresource "$target" 50
+    sudo update-alternatives --set gdm-theme.gresource "$target"
+
+    # The login screen runs as the gdm user and reads its own settings; the cursor must be system-wide.
+    if [ -d "$HOME/.local/share/icons/$CURSOR_THEME" ]; then
+        sudo rm -rf "/usr/share/icons/$CURSOR_THEME"
+        sudo cp -r "$HOME/.local/share/icons/$CURSOR_THEME" /usr/share/icons/
+    fi
+    local gdm_settings="sudo -H -u gdm dbus-run-session gsettings set org.gnome.desktop.interface"
+    (cd / && $gdm_settings cursor-theme "$CURSOR_THEME" && $gdm_settings cursor-size "$CURSOR_SIZE" \
+        && $gdm_settings font-name "$INTERFACE_FONT")
+    log "The new login screen shows up after the next logout or reboot"
+}
+
 save_dconf() {
     for ini in "$DESKTOP_DIR"/dconf/*.ini; do
         [ -e "$ini" ] || continue
@@ -342,6 +421,9 @@ section_enabled() {
         terminal) is_true "$ENABLE_TERMINAL" ;;
         wallpaper) is_true "$ENABLE_WALLPAPER" ;;
         keybindings) is_true "$ENABLE_KEYBINDINGS" ;;
+        plymouth) is_true "$ENABLE_PLYMOUTH" ;;
+        grub) is_true "$ENABLE_GRUB" ;;
+        gdm) is_true "$ENABLE_GDM" ;;
         *) echo "Unknown section: $1 (available: ${ALL_SECTIONS[*]})" >&2; exit 1 ;;
     esac
 }

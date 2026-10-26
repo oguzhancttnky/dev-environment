@@ -29,6 +29,21 @@ Bash is the default shell. `make` adds one line to `~/.bashrc` that sources [bas
 - Auto-hiding Ubuntu Dock, Catppuccin GNOME Terminal profile, fastfetch in new terminals
 - Rotating wallpapers from Wallhaven, the same image on every monitor (set `WALLPAPER_PER_MONITOR=true` for a separate, orientation matched image per monitor)
 
+Boot and login screens (sections `plymouth`, `grub`, `gdm`, need sudo):
+
+- Catppuccin Plymouth boot splash
+- Catppuccin GRUB theme, menu visible for 10s with Windows listed (settings in `/etc/default/grub.d/99-dev-environment.cfg`)
+- Catppuccin colored login screen built from Ubuntu's Yaru theme, plus Bibata cursor and Inter font
+- The motherboard logo is drawn by the firmware and can only be hidden in the BIOS settings
+
+To go back to Ubuntu's defaults:
+
+```sh
+sudo update-alternatives --remove default.plymouth /usr/share/plymouth/themes/catppuccin-mocha/catppuccin-mocha.plymouth && sudo update-initramfs -u
+sudo rm /etc/default/grub.d/99-dev-environment.cfg && sudo update-grub
+sudo update-alternatives --remove gdm-theme.gresource /usr/share/gnome-shell/theme/dev-environment/gdm-theme.gresource
+```
+
 Run it alone, or only some sections:
 
 ```sh
